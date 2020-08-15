@@ -6,4 +6,5 @@ section > * {
 
 #puzzle {
 	letter-spacing: 5pt;
+	word-spacing: 10pt;
 }
