@@ -4,20 +4,46 @@ module Html = Js_of_ocaml.Dom_html
 type state = {
         mutable n: int;
         mutable theme: string;
+        mutable complete: state -> unit;
         board: Html.element Js.t;
         pick: Html.element Js.t;
 }
 
+type theme = {
+        text: string;
+        complete: state -> unit;
+}
+
+let todo s = failwith s
+
 let themes = [|
-        "Theme not found";
-        "Bring me back";
-        "Turn it off and on again";
-        "Everything is lost";
-        "It is gilchted";
-        "desrever";
-        "water earth wind fire";
-        "bad day";
-        "That's all Folks!";
+        {text = "Theme not found"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "Bring me back"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "Turn it off and on again"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "Everything is lost"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "It is gilchted"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "desrever"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "water earth wind fire"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "bad day"; complete = (fun state ->
+                todo ""
+        )};
+        {text = "That's all Folks!"; complete = (fun state ->
+                todo ""
+        )};
 |]
 
 let log x = Firebug.console##log x
@@ -29,14 +55,15 @@ let get_board () = Option.get (Html.getElementById_coerce "puzzle" Html.CoerceTo
 let get_pick () = Option.get (Html.getElementById_coerce "pick" Html.CoerceTo.element)
 
 let create_state board pick =
+        let n = 0 in
+        let theme = themes.(n) in
         {
                 n = 0;
-                theme = themes.(0);
+                theme = theme.text;
+                complete = theme.complete;
                 board = board;
                 pick = pick;
         }
-
-let todo s = failwith s
 
 let char_of_string s def =
         if String.length s = 1 then s.[0]
@@ -91,8 +118,10 @@ let if_theme_found state f =
 
 let next_theme state =
         let next = state.n + 1 in
+        let theme = themes.(next) in
         state.n <- next;
-        state.theme <- themes.(next);
+        state.theme <- theme.text;
+        state.complete <- theme.complete;
         reset state
 
 let keypressed state ev =
