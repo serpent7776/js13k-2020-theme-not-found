@@ -2,7 +2,8 @@ open Js_of_ocaml
 module Html = Js_of_ocaml.Dom_html
 
 type state = {
-        theme: string;
+        mutable n: int;
+        mutable theme: string;
         board: Html.element Js.t;
         pick: Html.element Js.t;
 }
@@ -19,6 +20,14 @@ let nullstr () = Js.string ""
 let get_board () = Option.get (Html.getElementById_coerce "puzzle" Html.CoerceTo.element)
 
 let get_pick () = Option.get (Html.getElementById_coerce "pick" Html.CoerceTo.element)
+
+let create_state board pick =
+        {
+                n = 0;
+                theme = themes.(0);
+                board = board;
+                pick = pick;
+        }
 
 let todo s = failwith s
 
@@ -37,13 +46,14 @@ let with_char_of_js_string s f =
 let get_text elem =
         Js.Opt.case elem##.textContent nullstr id
 
-let reset board theme =
+let reset state =
         let f = function
                 | ' ' as c -> c
                 | _ -> '_'
         in
-        let pattern = String.map f theme in
-        board##.innerHTML := Js.string pattern
+        let pattern = String.map f state.theme in
+        state.board##.innerHTML := Js.string pattern;
+        state.pick##.innerHTML := Js.string ""
 
 let reveal_letter str letter theme =
         let lo = Char.lowercase_ascii in
@@ -72,6 +82,12 @@ let theme_found state =
 let if_theme_found state f =
         if theme_found state then f()
 
+let next_theme state =
+        let next = state.n + 1 in
+        state.n <- next;
+        state.theme <- themes.(next);
+        reset state
+
 let keypressed state ev =
         let key = ev##.key in
         let str = Js.Optdef.case key nullstr id in
@@ -79,7 +95,7 @@ let keypressed state ev =
                 reveal_board state c;
                 update_pick state.pick c;
                 if_theme_found state (fun () ->
-                        log "\\o/"
+                        next_theme state
                 )
         );
         Js._true
@@ -87,13 +103,8 @@ let keypressed state ev =
 let load _ =
         let board = get_board () in
         let pick = get_pick () in
-        let theme =  themes.(0) in
-        let state = {
-                theme = theme;
-                board = board;
-                pick = pick;
-        } in
-        reset board theme;
+        let state = create_state board pick in
+        reset state;
         Html.document##.onkeydown := Html.handler (keypressed state);
         Js._false
 
