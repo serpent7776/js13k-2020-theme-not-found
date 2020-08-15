@@ -11,6 +11,13 @@ type state = {
 let themes = [|
         "Theme not found";
         "Bring me back";
+        "Turn it off and on again";
+        "Everything is lost";
+        "It is gilchted";
+        "desrever";
+        "water earth wind fire";
+        "bad day";
+        "That's all Folks!";
 |]
 
 let log x = Firebug.console##log x
