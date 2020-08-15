@@ -24,6 +24,11 @@ let char_of_string s def =
 let char_of_js_string s def =
         char_of_string (Js.to_string s) def
 
+let with_char_of_js_string s f =
+        let nul = Char.chr 0 in
+        let c = char_of_js_string s nul in
+        if c != nul then f c
+
 let get_text elem =
         Js.Opt.case elem##.textContent nullstr id
 
@@ -58,9 +63,10 @@ let theme_found state =
 let keypressed state ev =
         let key = ev##.key in
         let str = Js.Optdef.case key nullstr id in
-        let letter = char_of_js_string str ' ' in
-        reveal_board state letter;
-        update_pick state.pick letter;
+        with_char_of_js_string str (fun c ->
+                reveal_board state c;
+                update_pick state.pick c
+        );
         Js._true
 
 let load _ =
