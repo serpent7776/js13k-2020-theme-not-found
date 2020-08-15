@@ -1,0 +1,9 @@
+section > * {
+	text-align: center;
+	font-size: 3em;
+	font-family: "sans";
+}
+
+#puzzle {
+	letter-spacing: 5pt;
+}
