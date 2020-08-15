@@ -58,14 +58,24 @@ let update_pick pick letter =
 
 let theme_found state =
         let text = get_text state.board in
+        text = Js.string state.theme
+
+let theme_found state =
+        let text = get_text state.board in
         Js.to_string text = state.theme
+
+let if_theme_found state f =
+        if theme_found state then f()
 
 let keypressed state ev =
         let key = ev##.key in
         let str = Js.Optdef.case key nullstr id in
         with_char_of_js_string str (fun c ->
                 reveal_board state c;
-                update_pick state.pick c
+                update_pick state.pick c;
+                if_theme_found state (fun () ->
+                        log "\\o/"
+                )
         );
         Js._true
 
