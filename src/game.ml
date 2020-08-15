@@ -4,6 +4,7 @@ module Html = Js_of_ocaml.Dom_html
 type state = {
         theme: string;
         board: Html.element Js.t;
+        pick: Html.element Js.t;
 }
 
 let log x = Firebug.console##log x
@@ -11,6 +12,8 @@ let id = Fun.id
 let nullstr () = Js.string ""
 
 let get_board () = Option.get (Html.getElementById_coerce "puzzle" Html.CoerceTo.element)
+
+let get_pick () = Option.get (Html.getElementById_coerce "pick" Html.CoerceTo.element)
 
 let todo s = failwith s
 
@@ -45,6 +48,9 @@ let reveal_board state letter =
         let new_s = reveal_letter (Js.to_string s) letter state.theme in
         state.board##.innerHTML := Js.string new_s
 
+let update_pick pick letter =
+        pick##.innerHTML := Js.string (String.make 1 letter)
+
 let theme_found state =
         let text = get_text state.board in
         Js.to_string text = state.theme
@@ -54,14 +60,17 @@ let keypressed state ev =
         let str = Js.Optdef.case key nullstr id in
         let letter = char_of_js_string str ' ' in
         reveal_board state letter;
+        update_pick state.pick letter;
         Js._true
 
 let load _ =
         let board = get_board () in
+        let pick = get_pick () in
         let theme =  "Theme not found" in
         let state = {
                 theme = theme;
                 board = board;
+                pick = pick;
         } in
         reset board theme;
         Html.document##.onkeydown := Html.handler (keypressed state);
