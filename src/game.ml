@@ -7,6 +7,11 @@ type state = {
         pick: Html.element Js.t;
 }
 
+let themes = [|
+        "Theme not found";
+        "Bring me back";
+|]
+
 let log x = Firebug.console##log x
 let id = Fun.id
 let nullstr () = Js.string ""
@@ -82,7 +87,7 @@ let keypressed state ev =
 let load _ =
         let board = get_board () in
         let pick = get_pick () in
-        let theme =  "Theme not found" in
+        let theme =  themes.(0) in
         let state = {
                 theme = theme;
                 board = board;
