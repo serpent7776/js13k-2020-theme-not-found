@@ -50,9 +50,11 @@ let log x = Firebug.console##log x
 let id = Fun.id
 let nullstr () = Js.string ""
 
-let get_board () = Option.get (Html.getElementById_coerce "puzzle" Html.CoerceTo.element)
+let get_element eid = Option.get (Html.getElementById_coerce eid Html.CoerceTo.element)
 
-let get_pick () = Option.get (Html.getElementById_coerce "pick" Html.CoerceTo.element)
+let get_board () = get_element "puzzle"
+
+let get_pick () = get_element "pick"
 
 let create_state board pick =
         let n = 0 in
