@@ -20,3 +20,11 @@ section > * {
 	transform: scale(0);
 	max-width: 0;
 }
+
+.th1 #note {
+	transition: opacity 1s ease;
+	opacity: 0;
+}
+.th1 #note.visible {
+	opacity: 1;
+}

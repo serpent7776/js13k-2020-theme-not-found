@@ -5,8 +5,10 @@ type state = {
         mutable n: int;
         mutable theme: string;
         mutable complete: state -> (unit -> unit) -> unit;
+        container: Html.element Js.t;
         board: Html.element Js.t;
         pick: Html.element Js.t;
+        note: Html.element Js.t;
 }
 
 type theme = {
@@ -29,12 +31,19 @@ let with_element eid f =
 let setClass elem cls =
         elem##setAttribute (Js.string "class") (Js.string cls)
 
+let removeClass elem =
+        elem##removeAttribute (Js.string "class")
+
 let delayed time f =
         ignore (Html.setTimeout f time)
+
+let get_container () = get_element "container"
 
 let get_board () = get_element "puzzle"
 
 let get_pick () = get_element "pick"
+
+let get_note () = get_element "note"
 
 let themes = [|
         {text = "Theme not found"; complete = (fun state cont ->
@@ -46,8 +55,14 @@ let themes = [|
                         delayed 1500.0 cont
                 )
         )};
-        {text = "Bring me back"; complete = (fun state cont ->
-                todo ""
+        {text = "Bring me back to life"; complete = (fun state cont ->
+                state.note##.innerHTML := (Js.string "<p>My previous game: <a target=\"_blank\" href=\"https://js13kgames.com/entries/back-to-life\">play it here</a></p><div><button id=\"continue\">Continue</button></div>");
+                with_element "continue" (fun button ->
+                        button##.onclick := Html.handler (fun _ -> cont (); Js._true)
+                );
+                delayed 250.0 (fun () ->
+                        setClass state.note "visible"
+                )
         )};
         {text = "Turn it off and on again"; complete = (fun state cont ->
                 todo ""
@@ -72,15 +87,17 @@ let themes = [|
         )};
 |]
 
-let create_state board pick =
+let create_state container board pick note =
         let n = 0 in
         let theme = themes.(n) in
         {
-                n = 0;
+                n = n;
                 theme = theme.text;
                 complete = theme.complete;
+                container = container;
                 board = board;
                 pick = pick;
+                note = note;
         }
 
 let char_of_string s def =
@@ -104,9 +121,11 @@ let reset state =
                 | _ -> '_'
         in
         let pattern = String.map f state.theme in
-        setClass state.board ("th" ^ string_of_int state.n);
+        setClass state.container ("th" ^ string_of_int state.n);
         state.board##.innerHTML := Js.string pattern;
-        state.pick##.innerHTML := Js.string ""
+        state.pick##.innerHTML := Js.string "";
+        state.note##.innerHTML := Js.string "";
+        removeClass state.note
 
 let reveal_letter str letter theme =
         let lo = Char.lowercase_ascii in
@@ -158,9 +177,11 @@ let keypressed (state: state) ev =
         Js._true
 
 let load _ =
+        let container = get_container () in
         let board = get_board () in
         let pick = get_pick () in
-        let state = create_state board pick in
+        let note = get_note () in
+        let state = create_state container board pick note in
         reset state;
         Html.document##.onkeydown := Html.handler (keypressed state);
         Js._false
