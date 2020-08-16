@@ -8,3 +8,15 @@ section > * {
 	letter-spacing: 5pt;
 	word-spacing: 10pt;
 }
+
+.th0 span {
+	max-width: 10em;
+}
+
+.th0 .vanish {
+	transition: opacity 1s ease, transform 1s ease, max-width 0.75s ease;
+	display: inline-block;
+	opacity: 0;
+	transform: scale(0);
+	max-width: 0;
+}

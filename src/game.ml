@@ -4,47 +4,17 @@ module Html = Js_of_ocaml.Dom_html
 type state = {
         mutable n: int;
         mutable theme: string;
-        mutable complete: state -> unit;
+        mutable complete: state -> (unit -> unit) -> unit;
         board: Html.element Js.t;
         pick: Html.element Js.t;
 }
 
 type theme = {
         text: string;
-        complete: state -> unit;
+        complete: state -> (unit -> unit) -> unit;
 }
 
 let todo s = failwith s
-
-let themes = [|
-        {text = "Theme not found"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "Bring me back"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "Turn it off and on again"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "Everything is lost"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "It is gilchted"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "desrever"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "water earth wind fire"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "bad day"; complete = (fun state ->
-                todo ""
-        )};
-        {text = "That's all Folks!"; complete = (fun state ->
-                todo ""
-        )};
-|]
 
 let log x = Firebug.console##log x
 let id = Fun.id
@@ -52,9 +22,55 @@ let nullstr () = Js.string ""
 
 let get_element eid = Option.get (Html.getElementById_coerce eid Html.CoerceTo.element)
 
+let with_element eid f =
+        let elem = get_element eid in
+        f elem
+
+let setClass elem cls =
+        elem##setAttribute (Js.string "class") (Js.string cls)
+
+let delayed time f =
+        ignore (Html.setTimeout f time)
+
 let get_board () = get_element "puzzle"
 
 let get_pick () = get_element "pick"
+
+let themes = [|
+        {text = "Theme not found"; complete = (fun state cont ->
+                state.board##.innerHTML := Js.string "<span>Theme</span> <span id=\"not\">not</span> <span>found</span>";
+                with_element "not" (fun elem ->
+                        delayed 250.0 (fun () ->
+                                setClass elem "vanish"
+                        );
+                        delayed 1500.0 cont
+                )
+        )};
+        {text = "Bring me back"; complete = (fun state cont ->
+                todo ""
+        )};
+        {text = "Turn it off and on again"; complete = (fun state cont ->
+                todo ""
+        )};
+        {text = "Everything is lost"; complete = (fun state cont ->
+                todo ""
+        )};
+        {text = "It is gilchted"; complete = (fun state cont ->
+                todo ""
+        )};
+        {text = "desrever"; complete = (fun state cont ->
+                todo ""
+        )};
+        {text = "water earth wind fire"; complete = (fun state cont ->
+                todo ""
+        )};
+        {text = "bad day"; complete = (fun state cont ->
+                todo ""
+        )};
+        {text = "That's all Folks!"; complete = (fun state cont ->
+                todo ""
+        )};
+|]
 
 let create_state board pick =
         let n = 0 in
@@ -88,6 +104,7 @@ let reset state =
                 | _ -> '_'
         in
         let pattern = String.map f state.theme in
+        setClass state.board ("th" ^ string_of_int state.n);
         state.board##.innerHTML := Js.string pattern;
         state.pick##.innerHTML := Js.string ""
 
@@ -126,14 +143,16 @@ let next_theme state =
         state.complete <- theme.complete;
         reset state
 
-let keypressed state ev =
+let keypressed (state: state) ev =
         let key = ev##.key in
         let str = Js.Optdef.case key nullstr id in
         with_char_of_js_string str (fun c ->
                 reveal_board state c;
                 update_pick state.pick c;
                 if_theme_found state (fun () ->
-                        next_theme state
+                        state.complete state (fun () ->
+                                next_theme state
+                        )
                 )
         );
         Js._true
