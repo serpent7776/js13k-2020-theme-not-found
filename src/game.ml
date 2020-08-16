@@ -20,7 +20,10 @@ let todo s = failwith s
 
 let log x = Firebug.console##log x
 let id = Fun.id
-let nullstr () = Js.string ""
+let jstr s = Js.string s
+let jtrue = Js._true
+let jfalse = Js._false
+let nullstr () = jstr ""
 
 let get_element eid = Option.get (Html.getElementById_coerce eid Html.CoerceTo.element)
 
@@ -29,10 +32,10 @@ let with_element eid f =
         f elem
 
 let setClass elem cls =
-        elem##setAttribute (Js.string "class") (Js.string cls)
+        elem##setAttribute (jstr "class") (jstr cls)
 
 let removeClass elem =
-        elem##removeAttribute (Js.string "class")
+        elem##removeAttribute (jstr "class")
 
 let delayed time f =
         ignore (Html.setTimeout f time)
@@ -47,7 +50,7 @@ let get_note () = get_element "note"
 
 let themes = [|
         {text = "Theme not found"; complete = (fun state cont ->
-                state.board##.innerHTML := Js.string "<span>Theme</span> <span id=\"not\">not</span> <span>found</span>";
+                state.board##.innerHTML := jstr "<span>Theme</span> <span id=\"not\">not</span> <span>found</span>";
                 with_element "not" (fun elem ->
                         delayed 250.0 (fun () ->
                                 setClass elem "vanish"
@@ -56,9 +59,9 @@ let themes = [|
                 )
         )};
         {text = "Bring me back to life"; complete = (fun state cont ->
-                state.note##.innerHTML := (Js.string "<p>My previous game: <a target=\"_blank\" href=\"https://js13kgames.com/entries/back-to-life\">play it here</a></p><div><button id=\"continue\">Continue</button></div>");
+                state.note##.innerHTML := (jstr "<p>My previous game: <a target=\"_blank\" href=\"https://js13kgames.com/entries/back-to-life\">play it here</a></p><div><button id=\"continue\">Continue</button></div>");
                 with_element "continue" (fun button ->
-                        button##.onclick := Html.handler (fun _ -> cont (); Js._true)
+                        button##.onclick := Html.handler (fun _ -> cont (); jtrue)
                 );
                 delayed 250.0 (fun () ->
                         setClass state.note "visible"
@@ -122,9 +125,9 @@ let reset state =
         in
         let pattern = String.map f state.theme in
         setClass state.container ("th" ^ string_of_int state.n);
-        state.board##.innerHTML := Js.string pattern;
-        state.pick##.innerHTML := Js.string "";
-        state.note##.innerHTML := Js.string "";
+        state.board##.innerHTML := jstr pattern;
+        state.pick##.innerHTML := jstr "";
+        state.note##.innerHTML := jstr "";
         removeClass state.note
 
 let reveal_letter str letter theme =
@@ -138,14 +141,14 @@ let reveal_letter str letter theme =
 let reveal_board state letter =
         let s = get_text state.board in
         let new_s = reveal_letter (Js.to_string s) letter state.theme in
-        state.board##.innerHTML := Js.string new_s
+        state.board##.innerHTML := jstr new_s
 
 let update_pick pick letter =
-        pick##.innerHTML := Js.string (String.make 1 letter)
+        pick##.innerHTML := jstr (String.make 1 letter)
 
 let theme_found state =
         let text = get_text state.board in
-        text = Js.string state.theme
+        text = jstr state.theme
 
 let theme_found state =
         let text = get_text state.board in
@@ -174,7 +177,7 @@ let keypressed (state: state) ev =
                         )
                 )
         );
-        Js._true
+        jtrue
 
 let load _ =
         let container = get_container () in
@@ -184,7 +187,7 @@ let load _ =
         let state = create_state container board pick note in
         reset state;
         Html.document##.onkeydown := Html.handler (keypressed state);
-        Js._false
+        jfalse
 
 let _ =
         Html.window##.onload := Html.handler load;
