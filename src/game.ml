@@ -42,9 +42,7 @@ let iteri_children (elem: Html.element Js.t) f =
         let size = children##.length in
         for i = 0 to size-1 do
                 let node = children##item i in
-                Js.Opt.iter node (fun node ->
-                        Js.Opt.iter (Html.CoerceTo.element node) (f i)
-                )
+                (Js.Opt.bind node Html.CoerceTo.element |> Js.Opt.iter) (f i)
         done
 
 let delayed time f =
