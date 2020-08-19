@@ -37,6 +37,16 @@ let setClass elem cls =
 let removeClass elem =
         elem##removeAttribute (jstr "class")
 
+let iteri_children (elem: Html.element Js.t) f =
+        let children = elem##.childNodes in
+        let size = children##.length in
+        for i = 0 to size-1 do
+                let node = children##item i in
+                Js.Opt.iter node (fun node ->
+                        Js.Opt.iter (Html.CoerceTo.element node) (f i)
+                )
+        done
+
 let delayed time f =
         ignore (Html.setTimeout f time)
 
@@ -118,30 +128,26 @@ let with_char_of_js_string s f =
 let get_text elem =
         Js.Opt.case elem##.textContent nullstr id
 
-let reset state =
-        let f = function
-                | ' ' as c -> c
-                | _ -> '_'
+let make_board_html theme =
+        let conv = function
+                | ' ' -> "<span class=\"space\"> </span>"
+                | _ -> "<span class=\"box\">_</span>"
         in
-        let pattern = String.map f state.theme in
+        String.to_seq theme |> Seq.map conv |> Seq.fold_left (^) ""
+
+let reset state =
         setClass state.container ("th" ^ string_of_int state.n);
-        state.board##.innerHTML := jstr pattern;
+        state.board##.innerHTML := jstr (make_board_html state.theme);
         state.pick##.innerHTML := jstr "";
         state.note##.innerHTML := jstr "";
         removeClass state.note
 
-let reveal_letter str letter theme =
-        let lo = Char.lowercase_ascii in
-        let f idx c =
-                if lo theme.[idx] = lo letter then theme.[idx]
-                else c
-        in
-        String.mapi f str
-
 let reveal_board state letter =
-        let s = get_text state.board in
-        let new_s = reveal_letter (Js.to_string s) letter state.theme in
-        state.board##.innerHTML := jstr new_s
+        let lo = Char.lowercase_ascii in
+        let lo_letter = lo letter in
+        iteri_children state.board (fun idx elem ->
+                if lo state.theme.[idx] = lo_letter then elem##.innerHTML := jstr (String.make 1 state.theme.[idx])
+        )
 
 let update_pick pick letter =
         pick##.innerHTML := jstr (String.make 1 letter)

@@ -4,13 +4,17 @@ section > * {
 	font-family: "sans";
 }
 
-#puzzle {
-	letter-spacing: 5pt;
-	word-spacing: 10pt;
+.space {
+	box-sizing: border-box;
+	display: inline-block;
+	width: 1em;
 }
-
-.th0 span {
-	max-width: 10em;
+.box {
+	box-sizing: border-box;
+	display: inline-block;
+	border: 1px solid #AAA;
+	width: 1em;
+	background: aliceblue;
 }
 
 .th0 .vanish {
