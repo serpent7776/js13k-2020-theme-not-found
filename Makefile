@@ -1,4 +1,4 @@
-.PHONY: env js dist
+.PHONY: env js dist serve
 
 all: js dist
 
@@ -15,3 +15,6 @@ dist: js
 	cp src/index.html src/style.css build/game.js dist/
 	zip -9r game.zip dist/
 	@printf '%s / %s\n' `stat -f '%z' game.zip` 13312
+
+serve:
+	cd dist && python -m http.server
