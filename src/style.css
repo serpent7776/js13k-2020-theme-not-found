@@ -4,16 +4,13 @@ section > * {
 	font-family: "sans";
 }
 
-.space {
+.box {
 	box-sizing: border-box;
 	display: inline-block;
 	width: 1em;
 }
-.box {
-	box-sizing: border-box;
-	display: inline-block;
+.box.c {
 	border: 1px solid #AAA;
-	width: 1em;
 	background: aliceblue;
 }
 

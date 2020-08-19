@@ -130,8 +130,8 @@ let get_text elem =
 
 let make_board_html theme =
         let conv = function
-                | ' ' -> "<span class=\"space\"> </span>"
-                | _ -> "<span class=\"box\">_</span>"
+                | ' ' -> "<span class=\"box\"> </span>"
+                | _ -> "<span class=\"box c\">_</span>"
         in
         String.to_seq theme |> Seq.map conv |> Seq.fold_left (^) ""
 
