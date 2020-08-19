@@ -148,10 +148,6 @@ let update_pick pick letter =
 
 let theme_found state =
         let text = get_text state.board in
-        text = jstr state.theme
-
-let theme_found state =
-        let text = get_text state.board in
         Js.to_string text = state.theme
 
 let if_theme_found state f =
