@@ -125,6 +125,9 @@ let with_char_of_js_string s f =
         let c = char_of_js_string s nul in
         if c != nul then f c
 
+let js_string_of_char c =
+        jstr (String.make 1 c)
+
 let get_text elem =
         Js.Opt.case elem##.textContent nullstr id
 
@@ -146,11 +149,11 @@ let reveal_board state letter =
         let lo = Char.lowercase_ascii in
         let lo_letter = lo letter in
         iteri_children state.board (fun idx elem ->
-                if lo state.theme.[idx] = lo_letter then elem##.innerHTML := jstr (String.make 1 state.theme.[idx])
+                if lo state.theme.[idx] = lo_letter then elem##.innerHTML := js_string_of_char state.theme.[idx]
         )
 
 let update_pick pick letter =
-        pick##.innerHTML := jstr (String.make 1 letter)
+        pick##.innerHTML := js_string_of_char letter
 
 let theme_found state =
         let text = get_text state.board in
