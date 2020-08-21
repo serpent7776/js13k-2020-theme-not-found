@@ -5,7 +5,6 @@ type state = {
         mutable n: int;
         mutable theme: string;
         mutable complete: state -> (unit -> unit) -> unit;
-        container: Html.element Js.t;
         board: Html.element Js.t;
         pick: Html.element Js.t;
         note: Html.element Js.t;
@@ -47,8 +46,6 @@ let iteri_children (elem: Html.element Js.t) f =
 
 let delayed time f =
         ignore (Html.setTimeout f time)
-
-let get_container () = get_element "container"
 
 let get_board () = get_element "puzzle"
 
@@ -98,14 +95,13 @@ let themes = [|
         )};
 |]
 
-let create_state container board pick note =
+let create_state board pick note =
         let n = 0 in
         let theme = themes.(n) in
         {
                 n = n;
                 theme = theme.text;
                 complete = theme.complete;
-                container = container;
                 board = board;
                 pick = pick;
                 note = note;
@@ -137,7 +133,9 @@ let make_board_html theme =
         String.to_seq theme |> Seq.map conv |> Seq.fold_left (^) ""
 
 let reset state =
-        setClass state.container ("th" ^ string_of_int state.n);
+        (Html.document##querySelector (jstr "body") |> Js.Opt.iter) (fun body ->
+                setClass body ("th" ^ string_of_int state.n)
+        );
         state.board##.innerHTML := jstr (make_board_html state.theme);
         state.pick##.innerHTML := jstr "";
         state.note##.innerHTML := jstr "";
@@ -183,11 +181,10 @@ let keypressed (state: state) ev =
         jtrue
 
 let load _ =
-        let container = get_container () in
         let board = get_board () in
         let pick = get_pick () in
         let note = get_note () in
-        let state = create_state container board pick note in
+        let state = create_state board pick note in
         reset state;
         Html.document##.onkeydown := Html.handler (keypressed state);
         jfalse
