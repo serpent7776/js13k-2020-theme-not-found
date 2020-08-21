@@ -13,13 +13,20 @@ section > * {
 	border: 1px solid #AAA;
 	background: aliceblue;
 }
+#not .box {
+	transition: max-width 1s ease;
+	max-width: 1em;
+}
+#not.vanish .box {
+	max-width: 0em;
+}
 
 .th0 .vanish {
-	transition: opacity 1s ease, transform 1s ease, max-width 0.75s ease;
+	transition: opacity 1s ease, transform 1s ease;
 	display: inline-block;
 	opacity: 0;
 	transform: scale(0);
-	max-width: 0;
+	transform-origin: 90% 50%;
 }
 
 .th1 #note {

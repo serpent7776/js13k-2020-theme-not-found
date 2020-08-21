@@ -58,7 +58,7 @@ let get_note () = get_element "note"
 
 let themes = [|
         {text = "Theme not found"; complete = (fun state cont ->
-                state.board##.innerHTML := jstr "<span>Theme</span> <span id=\"not\">not</span> <span>found</span>";
+                state.board##.innerHTML := jstr {|<span class="box c">T</span><span class="box c">h</span><span class="box c">e</span><span class="box c">m</span><span class="box c">e</span><span id="not"><span class="box"> </span><span class="box c">n</span><span class="box c">o</span><span class="box c">t</span></span><span class="box"> </span><span class="box c">f</span><span class="box c">o</span><span class="box c">u</span><span class="box c">n</span><span class="box c">d</span>|};
                 with_element "not" (fun elem ->
                         delayed 250.0 (fun () ->
                                 setClass elem "vanish"
