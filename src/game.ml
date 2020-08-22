@@ -87,7 +87,16 @@ let themes = [|
                 )
         )};
         {text = "Everything is lost"; complete = (fun state cont ->
-                todo ""
+                state.board##.innerHTML := jstr {|<span id="all"><span class="box c">E</span><span class="box c">v</span><span class="box c">e</span><span class="box c">r</span><span class="box c">y</span><span class="box c">t</span><span class="box c">h</span><span class="box c">i</span><span class="box c">n</span><span class="box c">g</span><span class="box"> </span><span class="box c">i</span><span class="box c">s</span><span class="box"> </span></span><span class="box c">l</span><span class="box c">o</span><span class="box c">s</span><span class="box c">t</span>|};
+                with_element "all" (fun elem ->
+                        delayed 500.0 (fun () ->
+                                setClass elem "rot"
+                        );
+                        delayed 1550.0 (fun () ->
+                                setClass elem "rot drop"
+                        );
+                        delayed 2000.0 cont
+                )
         )};
         {text = "It is gilchted"; complete = (fun state cont ->
                 todo ""
