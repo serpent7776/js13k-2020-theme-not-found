@@ -30,6 +30,9 @@ let with_element eid f =
         let elem = get_element eid in
         f elem
 
+let with_queried_element q f =
+        (Html.document##querySelector (jstr q) |> Js.Opt.iter) f
+
 let setClass elem cls =
         elem##setAttribute (jstr "class") (jstr cls)
 
@@ -72,8 +75,16 @@ let themes = [|
                         setClass state.note "visible"
                 )
         )};
-        {text = "Turn it off and on again"; complete = (fun state cont ->
-                todo ""
+        {text = "Turn it off and on again"; complete = (fun _ cont ->
+                with_queried_element "body" (fun body ->
+                        delayed 500.0 (fun () ->
+                                setClass body "th2 off"
+                        );
+                        delayed 2000.0 (fun () ->
+                                setClass body "th2"
+                        );
+                        delayed 3500.0 cont
+                )
         )};
         {text = "Everything is lost"; complete = (fun state cont ->
                 todo ""
@@ -133,7 +144,7 @@ let make_board_html theme =
         String.to_seq theme |> Seq.map conv |> Seq.fold_left (^) ""
 
 let reset state =
-        (Html.document##querySelector (jstr "body") |> Js.Opt.iter) (fun body ->
+        with_queried_element "body" (fun body ->
                 setClass body ("th" ^ string_of_int state.n)
         );
         state.board##.innerHTML := jstr (make_board_html state.theme);

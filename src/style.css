@@ -36,3 +36,14 @@ section > * {
 .th1 #note.visible {
 	opacity: 1;
 }
+
+.th2 {
+	transition: background-color 1s ease, color 1s ease;
+}
+.th2.off {
+	background: black;
+	color: white;
+}
+.th2.off .box.c {
+	background: dimgrey;
+}
