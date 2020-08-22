@@ -98,7 +98,7 @@ let themes = [|
                         delayed 2000.0 cont
                 )
         )};
-        {text = "It is gilchted"; complete = (fun state cont ->
+        {text = "It is gilchtyd"; complete = (fun state cont ->
                 todo ""
         )};
         {text = "desrever"; complete = (fun state cont ->
