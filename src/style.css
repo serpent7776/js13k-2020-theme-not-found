@@ -61,3 +61,79 @@ section > * {
 	transition: transform 1s ease;
 	transform: rotate(90deg) translate(40em, 0);
 }
+
+.th4 #puzzle > span {
+	transition: color 1s ease;
+}
+
+.th4 .glitch {
+	--offp: 1px;
+	--offm: calc(0px - var(--offp));
+	display: inline-block;
+	animation: textglitch .3s ease infinite;
+}
+
+.th4 #puzzle.burn > span {
+	color: transparent;
+	background-image: linear-gradient(red, yellow, red);
+	background-size: 200% 200%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	animation: fire 3s linear infinite;
+}
+
+.th4 #puzzle.burn > #y {
+	--offp: 2px;
+	--del: 0s;
+}
+.th4 #puzzle.burn > .glitch {
+	--delay: calc(var(--del) / 10);
+	animation: textglitch .3s var(--delay) ease infinite, fire 3s linear infinite;
+}
+
+.th4 #puzzle.boom .box {
+	animation: boom 1s ease-out both;
+}
+
+@keyframes textglitch {
+	0% {
+		transform: translate(0px)
+	}
+	20% {
+		transform: translate(var(--offm), var(--offp))
+	}
+	40% {
+		transform: translate(var(--offm), var(--offm))
+	}
+	60% {
+		transform: translate(var(--offp), var(--offp))
+	}
+	80% {
+		transform: translate(var(--offp), var(--offm))
+	}
+	to {
+		transform: translate(0px)
+	}
+}
+
+@keyframes fire {
+	0% {
+		background-position: 0% 0%;
+	}
+	to {
+		background-position: 0% 200%;
+	}
+}
+
+@keyframes boom {
+	0% {
+		opacity: 1;
+		color: transparent;
+		transform: scale(1) translate(0px, 0px) rotate(0deg);
+	}
+	to {
+		opacity: 0;
+		color: orange;
+		transform: scale(3) translate(var(--dist), 0px) rotate(900deg);
+	}
+}

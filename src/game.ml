@@ -24,7 +24,24 @@ let jtrue = Js._true
 let jfalse = Js._false
 let nullstr () = jstr ""
 
+let char_of_string s def =
+        if String.length s = 1 then s.[0]
+        else def
+
+let char_of_js_string s def =
+        char_of_string (Js.to_string s) def
+
+let with_char_of_js_string s f =
+        let nul = Char.chr 0 in
+        let c = char_of_js_string s nul in
+        if c != nul then f c
+
+let js_string_of_char c =
+        jstr (String.make 1 c)
+
 let get_element eid = Option.get (Html.getElementById_coerce eid Html.CoerceTo.element)
+
+let with_parent_element elem f = ((Js.Opt.bind elem##.parentNode Html.CoerceTo.element) |> Js.Opt.iter) f
 
 let with_element eid f =
         let elem = get_element eid in
@@ -36,8 +53,17 @@ let with_queried_element q f =
 let setClass elem cls =
         elem##setAttribute (jstr "class") (jstr cls)
 
+let addClass (elem: Html.element Js.t) cls =
+        let class_str = (jstr "class") in
+        let current_cls = (elem##getAttribute class_str |> Js.Opt.get) (fun () -> jstr "") in
+        let new_cls = current_cls##concat_2 (jstr " ") (jstr cls) in
+        elem##setAttribute class_str new_cls
+
 let removeClass elem =
         elem##removeAttribute (jstr "class")
+
+let setStyle elem style =
+        elem##setAttribute (jstr "style") (jstr style)
 
 let iteri_children (elem: Html.element Js.t) f =
         let children = elem##.childNodes in
@@ -99,7 +125,31 @@ let themes = [|
                 )
         )};
         {text = "It is gilchtyd"; complete = (fun state cont ->
-                todo ""
+                state.board##.innerHTML := jstr {|<span class="box c">I</span><span class="box c">t</span><span class="box"> </span><span class="box c">i</span><span class="box c">s</span><span class="box"> </span><span class="box c">g</span><span class="box c">i</span><span class="box c">l</span><span class="box c">c</span><span class="box c">h</span><span class="box c">t</span><span class="box c" id="y">y</span><span class="box c">d</span>|};
+                with_element "y" (fun elem ->
+                        delayed 400.0 (fun () ->
+                                addClass elem "glitch";
+                                delayed 600.0 (fun () ->
+                                        with_parent_element elem (fun board ->
+                                                setClass board "burn";
+                                                delayed 500.0 (fun () ->
+                                                        let yidx = 12 in
+                                                        iteri_children board (fun idx box ->
+                                                                let delay = abs (idx - yidx) in
+                                                                let distf = ((float_of_int idx) -. 7.5) *. 2.0 in
+                                                                let dist = int_of_float distf in
+                                                                addClass box "glitch";
+                                                                setStyle box ("--del: " ^ (string_of_int delay) ^ "s; --dist: " ^ (string_of_int dist) ^ "em")
+                                                        );
+                                                        delayed 2000.0 (fun () ->
+                                                                addClass board "boom";
+                                                                delayed 2000.0 cont
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
         )};
         {text = "desrever"; complete = (fun state cont ->
                 todo ""
@@ -126,21 +176,6 @@ let create_state board pick note =
                 pick = pick;
                 note = note;
         }
-
-let char_of_string s def =
-        if String.length s = 1 then s.[0]
-        else def
-
-let char_of_js_string s def =
-        char_of_string (Js.to_string s) def
-
-let with_char_of_js_string s f =
-        let nul = Char.chr 0 in
-        let c = char_of_js_string s nul in
-        if c != nul then f c
-
-let js_string_of_char c =
-        jstr (String.make 1 c)
 
 let get_text elem =
         Js.Opt.case elem##.textContent nullstr id
