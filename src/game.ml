@@ -3,11 +3,13 @@ module Html = Js_of_ocaml.Dom_html
 
 type state = {
         mutable n: int;
+        mutable typos: int;
         mutable theme: string;
         mutable complete: state -> (unit -> unit) -> unit;
         board: Html.element Js.t;
         pick: Html.element Js.t;
         note: Html.element Js.t;
+        counter: Html.element Js.t;
 }
 
 type theme = {
@@ -100,6 +102,8 @@ let get_pick () = get_element "pick"
 
 let get_note () = get_element "note"
 
+let get_counter () = get_element "counter"
+
 let themes = [|
         {text = "Theme not found"; complete = (fun state cont ->
                 state.board##.innerHTML := jstr {|<span class="box c">T</span><span class="box c">h</span><span class="box c">e</span><span class="box c">m</span><span class="box c">e</span><span id="not"><span class="box"> </span><span class="box c">n</span><span class="box c">o</span><span class="box c">t</span></span><span class="box"> </span><span class="box c">f</span><span class="box c">o</span><span class="box c">u</span><span class="box c">n</span><span class="box c">d</span>|};
@@ -179,16 +183,18 @@ let themes = [|
         )};
 |]
 
-let create_state board pick note =
+let create_state board pick note counter =
         let n = 0 in
         let theme = themes.(n) in
         {
                 n = n;
+                typos = 0;
                 theme = theme.text;
                 complete = theme.complete;
                 board = board;
                 pick = pick;
                 note = note;
+                counter = counter;
         }
 
 let get_text elem =
@@ -217,8 +223,19 @@ let reveal_board state letter =
                 if lo state.theme.[idx] = lo_letter then elem##.innerHTML := js_string_of_char state.theme.[idx]
         )
 
+let handle_user_pick state letter =
+        let text_old = (state.board##.textContent |> Js.Opt.get) nullstr in
+        reveal_board state letter;
+        let text_new = (state.board##.textContent |> Js.Opt.get) nullstr in
+        if Js.to_string text_old = Js.to_string text_new then
+                state.typos <- state.typos + 1
+
 let update_pick pick letter =
         pick##.innerHTML := js_string_of_char letter
+
+let update_typos counter count =
+        let typos = string_of_int count in
+        counter##.innerHTML := jstr typos
 
 let theme_found state =
         let text = get_text state.board in
@@ -239,8 +256,9 @@ let keypressed (state: state) ev =
         let key = ev##.key in
         let str = Js.Optdef.case key nullstr id in
         with_char_of_js_string str (fun c ->
-                reveal_board state c;
+                handle_user_pick state c;
                 update_pick state.pick c;
+                update_typos state.counter state.typos;
                 if_theme_found state (fun () ->
                         state.complete state (fun () ->
                                 next_theme state
@@ -253,7 +271,8 @@ let load _ =
         let board = get_board () in
         let pick = get_pick () in
         let note = get_note () in
-        let state = create_state board pick note in
+        let counter = get_counter () in
+        let state = create_state board pick note counter in
         reset state;
         Html.document##.onkeydown := Html.handler (keypressed state);
         jfalse
