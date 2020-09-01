@@ -224,10 +224,8 @@ let reveal_board state letter =
         )
 
 let handle_user_pick state letter =
-        let text_old = (state.board##.textContent |> Js.Opt.get) nullstr in
         reveal_board state letter;
-        let text_new = (state.board##.textContent |> Js.Opt.get) nullstr in
-        if Js.to_string text_old = Js.to_string text_new then
+        if not (String.contains state.theme letter) then
                 state.typos <- state.typos + 1
 
 let update_pick pick letter =
