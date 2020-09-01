@@ -76,6 +76,24 @@ let iteri_children (elem: Html.element Js.t) f =
 let delayed time f =
         ignore (Html.setTimeout f time)
 
+type delay_t = {
+        delay: float;
+        proc: unit -> unit;
+}
+
+let run (d: delay_t) =
+        delayed d.delay d.proc
+
+let (@>>) d1 d2 = {
+        delay = d1.delay;
+        proc = (fun () -> d1.proc (); run d2)
+}
+
+let delay_mk time f = {
+        delay = time;
+        proc = f;
+}
+
 let get_board () = get_element "puzzle"
 
 let get_pick () = get_element "pick"
@@ -127,27 +145,23 @@ let themes = [|
         {text = "It is gilchtyd"; complete = (fun state cont ->
                 state.board##.innerHTML := jstr {|<span class="box c">I</span><span class="box c">t</span><span class="box"> </span><span class="box c">i</span><span class="box c">s</span><span class="box"> </span><span class="box c">g</span><span class="box c">i</span><span class="box c">l</span><span class="box c">c</span><span class="box c">h</span><span class="box c">t</span><span class="box c" id="y">y</span><span class="box c">d</span>|};
                 with_element "y" (fun elem ->
-                        delayed 400.0 (fun () ->
-                                addClass elem "glitch";
-                                delayed 600.0 (fun () ->
-                                        with_parent_element elem (fun board ->
-                                                setClass board "burn";
-                                                delayed 500.0 (fun () ->
-                                                        let yidx = 12 in
-                                                        iteri_children board (fun idx box ->
-                                                                let delay = abs (idx - yidx) in
-                                                                let distf = ((float_of_int idx) -. 7.5) *. 2.0 in
-                                                                let dist = int_of_float distf in
-                                                                addClass box "glitch";
-                                                                setStyle box ("--del: " ^ (string_of_int delay) ^ "s; --dist: " ^ (string_of_int dist) ^ "em")
-                                                        );
-                                                        delayed 2000.0 (fun () ->
-                                                                addClass board "boom";
-                                                                delayed 2000.0 cont
-                                                        )
-                                                )
+                        with_parent_element elem (fun board ->
+                                delay_mk 400.0 (fun () ->
+                                        addClass elem "glitch"
+                                ) @>> delay_mk 600.0 (fun () ->
+                                        setClass board "burn"
+                                ) @>> delay_mk 500.0 (fun () ->
+                                        let yidx = 12 in
+                                        iteri_children board (fun idx box ->
+                                                let delay = abs (idx - yidx) in
+                                                let distf = ((float_of_int idx) -. 7.5) *. 2.0 in
+                                                let dist = int_of_float distf in
+                                                addClass box "glitch";
+                                                setStyle box ("--del: " ^ (string_of_int delay) ^ "s; --dist: " ^ (string_of_int dist) ^ "em")
                                         )
-                                )
+                                ) @>> delay_mk 2000.0 (fun () ->
+                                        addClass board "boom"
+                                ) @>> delay_mk 2000.0 cont |> run
                         )
                 )
         )};
