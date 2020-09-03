@@ -149,24 +149,22 @@ let themes = [|
         {text = "It is gilchtyd"; complete = (fun state cont ->
                 state.board##.innerHTML := jstr {|<span class="box c">I</span><span class="box c">t</span><span class="box"> </span><span class="box c">i</span><span class="box c">s</span><span class="box"> </span><span class="box c">g</span><span class="box c">i</span><span class="box c">l</span><span class="box c">c</span><span class="box c">h</span><span class="box c">t</span><span class="box c" id="y">y</span><span class="box c">d</span>|};
                 with_element "y" (fun elem ->
-                        with_parent_element elem (fun board ->
-                                delay_mk 400.0 (fun () ->
-                                        addClass elem "glitch"
-                                ) @>> delay_mk 600.0 (fun () ->
-                                        setClass board "burn"
-                                ) @>> delay_mk 500.0 (fun () ->
-                                        let yidx = 12 in
-                                        iteri_children board (fun idx box ->
-                                                let delay = abs (idx - yidx) in
-                                                let distf = ((float_of_int idx) -. 7.5) *. 2.0 in
-                                                let dist = int_of_float distf in
-                                                addClass box "glitch";
-                                                setStyle box ("--del: " ^ (string_of_int delay) ^ "s; --dist: " ^ (string_of_int dist) ^ "em")
-                                        )
-                                ) @>> delay_mk 2000.0 (fun () ->
-                                        addClass board "boom"
-                                ) @>> delay_mk 2000.0 cont |> run
-                        )
+                        delay_mk 400.0 (fun () ->
+                                addClass elem "glitch"
+                        ) @>> delay_mk 600.0 (fun () ->
+                                setClass state.board "burn"
+                        ) @>> delay_mk 500.0 (fun () ->
+                                let yidx = 12 in
+                                iteri_children state.board (fun idx box ->
+                                        let delay = abs (idx - yidx) in
+                                        let distf = ((float_of_int idx) -. 7.5) *. 2.0 in
+                                        let dist = int_of_float distf in
+                                        addClass box "glitch";
+                                        setStyle box ("--del: " ^ (string_of_int delay) ^ "s; --dist: " ^ (string_of_int dist) ^ "em")
+                                )
+                        ) @>> delay_mk 2000.0 (fun () ->
+                                addClass state.board "boom"
+                        ) @>> delay_mk 2000.0 cont |> run
                 )
         )};
         {text = "desrever"; complete = (fun state cont ->
