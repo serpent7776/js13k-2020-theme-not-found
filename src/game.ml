@@ -168,7 +168,12 @@ let themes = [|
                 )
         )};
         {text = "desrever"; complete = (fun state cont ->
-                todo ""
+                iteri_children state.board (fun idx elem ->
+                        let delta = (3.5 -. (float_of_int idx)) *. 2.0 |> int_of_float in
+                        setStyle elem ("--d: " ^ (string_of_int delta) ^ "em")
+                );
+                addClass state.board "rev";
+                delayed 5500.0 cont
         )};
         {text = "water earth wind fire"; complete = (fun state cont ->
                 todo ""

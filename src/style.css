@@ -95,6 +95,14 @@ section > * {
 	animation: boom 1s ease-out both;
 }
 
+.th5 .box {
+	transition: transform 3s 1s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+.th5 .rev .box {
+	transform: translate(var(--d), 0em);
+}
+
 @keyframes textglitch {
 	0% {
 		transform: translate(0px)
