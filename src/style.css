@@ -103,6 +103,47 @@ section > * {
 	transform: translate(var(--d), 0em);
 }
 
+.th6 #wa .box {
+	transition: color 1s ease, text-shadow 1s ease, box-shadow 1s ease, border-radius 1s ease;
+}
+.th6 #ea .box {
+	transition: text-shadow 1s ease, border 1s ease;
+}
+.th6 #wi .box {
+	transition: transform 1s ease, color 1s ease, border 1s ease, box-shadow 1s ease;
+}
+.th6 #fi .box {
+	transition: color 1s ease, filter 1s ease;
+}
+.th6 #wa.tr .box {
+	color: transparent;
+	text-shadow: 0px 0px 1px blue;
+	box-shadow: 1pt 1pt 12pt blue;
+	border-radius: 10pt;
+}
+.th6 #ea.tr .box {
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	background-image: linear-gradient(#ae3d3d 75%, #662b2b);
+	border-width: 2px;
+	border-color: black;
+}
+.th6 #wi.tr .box {
+	color: transparent;
+	background-clip: text;
+	background-image: linear-gradient(blue, white);
+	border-color: white;
+	box-shadow: 1px 1px 2px gray;
+	transform: skew(16deg, 0);
+	display: inline-block;
+}
+.th6 #fi.tr .box {
+	color: white;
+	background-image: linear-gradient(yellow, red, yellow);
+	background-size: 200% 200%;
+	filter: blur(1pt);
+	animation: fire 2s linear infinite;
+}
+
 @keyframes textglitch {
 	0% {
 		transform: translate(0px)

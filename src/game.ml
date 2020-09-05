@@ -176,7 +176,20 @@ let themes = [|
                 delayed 5500.0 cont
         )};
         {text = "water earth wind fire"; complete = (fun state cont ->
-                todo ""
+                state.board##.innerHTML := jstr {|<span id="wa"><span class="box c">w</span><span class="box c">a</span><span class="box c">t</span><span class="box c">e</span><span class="box c">r</span></span><span class="box"> </span><span id="ea"><span class="box c">e</span><span class="box c">a</span><span class="box c">r</span><span class="box c">t</span><span class="box c">h</span></span><span class="box"> </span><span id="wi"><span class="box c">w</span><span class="box c">i</span><span class="box c">n</span><span class="box c">d</span></span><span class="box"> </span><span id="fi"><span class="box c">f</span><span class="box c">i</span><span class="box c">r</span><span class="box c">e</span></span>|};
+                delayed 1000.0 (fun () ->
+                        with_element "wa" (fun e -> addClass e "tr")
+                );
+                delayed 2000.0 (fun () ->
+                        with_element "ea" (fun e -> addClass e "tr")
+                );
+                delayed 3000.0 (fun () ->
+                        with_element "wi" (fun e -> addClass e "tr")
+                );
+                delayed 4000.0 (fun () ->
+                        with_element "fi" (fun e -> addClass e "tr")
+                );
+                delayed 6000.0 cont
         )};
         {text = "bad day"; complete = (fun state cont ->
                 todo ""
