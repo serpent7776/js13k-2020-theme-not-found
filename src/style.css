@@ -1,7 +1,19 @@
+html {
+	background: whitesmoke;
+}
+
 section > * {
 	text-align: center;
 	font-size: 3em;
 	font-family: "sans";
+}
+
+#puzzle {
+	padding: 1em 0;
+	border: 1pt grey solid;
+	border-radius: 12pt;
+	box-shadow: 1pt 1pt 1pt grey;
+	background: white;
 }
 
 .box {
