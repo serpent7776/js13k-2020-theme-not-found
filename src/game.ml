@@ -191,16 +191,20 @@ let themes = [|
                 );
                 delayed 6000.0 cont
         )};
-        {text = "bad day"; complete = (fun state cont ->
-                todo ""
-        )};
         {text = "That's all Folks!"; complete = (fun state cont ->
-                todo ""
+                with_queried_element "body" (fun body ->
+                        delayed 1000.0 (fun () ->
+                                addClass body "black";
+                                delayed 2000.0 (fun () ->
+                                        addClass body "done"
+                                )
+                        )
+                )
         )};
 |]
 
 let create_state board pick note counter =
-        let n = 0 in
+        let n = 7 in
         let theme = themes.(n) in
         {
                 n = n;

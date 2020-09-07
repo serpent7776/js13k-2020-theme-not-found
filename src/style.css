@@ -1,5 +1,16 @@
 html {
-	background: whitesmoke;
+	height: 100%;
+}
+
+body {
+	min-height: 100%;
+	margin: 0;
+	background-color: whitesmoke;
+}
+
+h1 {
+	margin: 0;
+	padding: 1em 0;
 }
 
 section > * {
@@ -156,6 +167,29 @@ section > * {
 	animation: fire 2s linear infinite;
 }
 
+.th7 h1, .th7 p {
+	transition: opacity 1s ease;
+}
+.th7 #puzzle {
+	transition: border 1s ease, background 1s ease, box-shadow 1s ease, border-radius 1s ease;
+}
+.th7.black {
+	animation: blacken 2s ease-in-out both;
+}
+.th7.done {
+	background-image: radial-gradient(circle, black 14%, #c44b07 15%, #67060e 24%, #be4a12 25%, #59030e 34%, #ab3e06 35%, #4f050c 44%, #8e3106 45%, #3e020b 54%, #6d2504 55%, #2c0207 64%, black);
+	background-position: center;
+	animation: zoom 1s ease-in-out both;
+}
+.th7.done h1, .th7.black p {
+	opacity: 0;
+}
+.th7.black #puzzle {
+	border: 0;
+	background: transparent;
+	box-shadow: 0 0;
+}
+
 @keyframes textglitch {
 	0% {
 		transform: translate(0px)
@@ -196,5 +230,23 @@ section > * {
 		opacity: 0;
 		color: orange;
 		transform: scale(3) translate(var(--dist), 0px) rotate(900deg);
+	}
+}
+
+@keyframes blacken {
+	0% {
+		background-color: whitesmoke;
+	}
+	100% {
+		background-color: black;
+	}
+}
+
+@keyframes zoom {
+	0% {
+		background-size: 999% 999%;
+	}
+	100% {
+		background-size: 100% 100%;
 	}
 }
