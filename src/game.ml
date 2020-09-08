@@ -319,6 +319,27 @@ let keypressed (state: state) ev =
                 );
                 jtrue
 
+let clicked (state: state) ev =
+        Js.Opt.iter ev##.target (fun elem ->
+                let letter_clicked = Js.to_string elem##.className = "ch" in
+                if letter_clicked && state.enabled then (
+                        let str = Js.Opt.case elem##.textContent nullstr id in
+                        with_char_of_js_string str (fun c ->
+                                handle_user_pick state c;
+                                update_pick state.pick c;
+                                update_typos state.counter state.typos;
+                                if_theme_found state (fun () ->
+                                        enable_controls state false;
+                                        state.complete state (fun () ->
+                                                enable_controls state true;
+                                                next_theme state
+                                        )
+                                )
+                        )
+                )
+        );
+        jtrue
+
 let load _ =
         let board = get_board () in
         let pick = get_pick () in
@@ -326,6 +347,9 @@ let load _ =
         let state = create_state board pick counter in
         reset state;
         Html.document##.onkeydown := Html.handler (keypressed state);
+        with_element "ltrs" (fun elem ->
+                elem##.onclick := Html.handler (clicked state)
+        );
         jfalse
 
 let _ =

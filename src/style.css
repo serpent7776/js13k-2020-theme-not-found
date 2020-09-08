@@ -27,6 +27,13 @@ section > * {
 	background: white;
 }
 
+.ch {
+	display: inline-block;
+	width: 1em;
+	border: 1px solid #AAA;
+	box-shadow: 1pt 1pt 0.5pt grey;
+}
+
 .box {
 	box-sizing: border-box;
 	box-shadow: 1px 1px 2px #800;
