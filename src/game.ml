@@ -67,12 +67,15 @@ let removeClass elem =
 let setStyle elem style =
         elem##setAttribute (jstr "style") (jstr style)
 
+let with_nth_child parent n f =
+        let child_node = parent##.childNodes##item n in
+        (Js.Opt.bind child_node Html.CoerceTo.element |> Js.Opt.iter) f
+
 let iteri_children (elem: Html.element Js.t) f =
         let children = elem##.childNodes in
         let size = children##.length in
         for i = 0 to size-1 do
-                let node = children##item i in
-                (Js.Opt.bind node Html.CoerceTo.element |> Js.Opt.iter) (f i)
+                with_nth_child elem i (f i)
         done
 
 let delayed time f =
@@ -196,15 +199,19 @@ let themes = [|
                         delayed 1000.0 (fun () ->
                                 addClass body "black";
                                 delayed 2000.0 (fun () ->
-                                        addClass body "done"
+                                        addClass body "done";
+                                        delayed 5000.0 cont
                                 )
                         )
                 )
         )};
+        {text = "Thanks for playing!"; complete = (fun _ _ ->
+                ()
+        )};
 |]
 
 let create_state board pick note counter =
-        let n = 7 in
+        let n = 0 in
         let theme = themes.(n) in
         {
                 n = n;
@@ -262,13 +269,38 @@ let theme_found state =
 let if_theme_found state f =
         if theme_found state then f()
 
+let last n =
+        let last_idx = Array.length themes - 1 in
+        last_idx = n
+
+let end_game state =
+        String.iteri (fun idx c ->
+                with_nth_child state.board idx (fun box ->
+                        box##.innerHTML := js_string_of_char c
+                )
+        ) state.theme;
+        let lcg n = (3 * n) mod 19 in
+        let r = ref 1 in
+        let n = String.length state.theme in
+        let cb = Js.wrap_callback (fun () ->
+                incr r;
+                let nth = lcg !r mod n in
+                with_nth_child state.board nth (fun elem ->
+                        delayed 250.0 (fun () -> elem##.style##.color := jstr "black");
+                        delayed 1000.0 (fun () -> elem##.style##.color := jstr "transparent")
+                )
+        ) in
+        Html.window##setInterval cb 100.0 |> ignore
+
 let next_theme state =
         let next = state.n + 1 in
         let theme = themes.(next) in
         state.n <- next;
         state.theme <- theme.text;
         state.complete <- theme.complete;
-        reset state
+        reset state;
+        if last state.n then
+                end_game state
 
 let keypressed (state: state) ev =
         let key = ev##.key in
