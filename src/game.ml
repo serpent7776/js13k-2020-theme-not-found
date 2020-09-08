@@ -252,7 +252,9 @@ let reveal_board state letter =
 
 let handle_user_pick state letter =
         reveal_board state letter;
-        if not (String.contains state.theme letter) then
+        let theme_low = state.theme |> String.lowercase_ascii in
+        let letter_low = Char.lowercase_ascii letter in
+        if not (String.contains theme_low letter_low) then
                 state.typos <- state.typos + 1
 
 let update_pick pick letter =
