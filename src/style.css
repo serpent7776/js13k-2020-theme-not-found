@@ -53,12 +53,8 @@ section > * {
 	transform-origin: 90% 50%;
 }
 
-.th1 #note {
-	transition: opacity 1s ease;
-	opacity: 0;
-}
-.th1 #note.visible {
-	opacity: 1;
+.th1.done {
+	animation: skew 1s ease both;
 }
 
 .th2 {
@@ -253,5 +249,14 @@ section > * {
 	}
 	100% {
 		background-size: 100% 100%;
+	}
+}
+
+@keyframes skew {
+	0% {
+		transform: skew(0deg) translateX(0);
+	}
+	100% {
+		transform: skew(90deg) translateX(-90%);
 	}
 }

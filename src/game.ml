@@ -9,7 +9,6 @@ type state = {
         mutable complete: state -> (unit -> unit) -> unit;
         board: Html.element Js.t;
         pick: Html.element Js.t;
-        note: Html.element Js.t;
         counter: Html.element Js.t;
 }
 
@@ -104,8 +103,6 @@ let get_board () = get_element "puzzle"
 
 let get_pick () = get_element "pick"
 
-let get_note () = get_element "note"
-
 let get_counter () = get_element "counter"
 
 let themes = [|
@@ -119,12 +116,9 @@ let themes = [|
                 )
         )};
         {text = "Bring me back to life"; complete = (fun state cont ->
-                state.note##.innerHTML := (jstr "<p>My previous game: <a target=\"_blank\" href=\"https://js13kgames.com/entries/back-to-life\">play it here</a></p><div><button id=\"continue\">Continue</button></div>");
-                with_element "continue" (fun button ->
-                        button##.onclick := Html.handler (fun _ -> cont (); jtrue)
-                );
-                delayed 250.0 (fun () ->
-                        setClass state.note "visible"
+                with_queried_element "body" (fun body ->
+                        addClass body "done";
+                        delayed 1250.0 cont
                 )
         )};
         {text = "Turn it off and on again"; complete = (fun _ cont ->
@@ -211,7 +205,7 @@ let themes = [|
         )};
 |]
 
-let create_state board pick note counter =
+let create_state board pick counter =
         let n = 0 in
         let theme = themes.(n) in
         {
@@ -222,7 +216,6 @@ let create_state board pick note counter =
                 complete = theme.complete;
                 board = board;
                 pick = pick;
-                note = note;
                 counter = counter;
         }
 
@@ -245,9 +238,7 @@ let reset state =
                 setClass body ("th" ^ string_of_int state.n)
         );
         state.board##.innerHTML := jstr (make_board_html state.theme);
-        state.pick##.innerHTML := jstr "";
-        state.note##.innerHTML := jstr "";
-        removeClass state.note
+        state.pick##.innerHTML := jstr ""
 
 let reveal_board state letter =
         let lo = Char.lowercase_ascii in
@@ -331,9 +322,8 @@ let keypressed (state: state) ev =
 let load _ =
         let board = get_board () in
         let pick = get_pick () in
-        let note = get_note () in
         let counter = get_counter () in
-        let state = create_state board pick note counter in
+        let state = create_state board pick counter in
         reset state;
         Html.document##.onkeydown := Html.handler (keypressed state);
         jfalse
