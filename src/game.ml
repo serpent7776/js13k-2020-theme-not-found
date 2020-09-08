@@ -301,42 +301,31 @@ let next_theme state =
 let enable_controls state enable =
         state.enabled <- enable
 
+let letter_picked state letter =
+        if state.enabled then
+                handle_user_pick state letter;
+                update_pick state.pick letter;
+                update_typos state.counter state.typos;
+                if_theme_found state (fun () ->
+                        enable_controls state false;
+                        state.complete state (fun () ->
+                                enable_controls state true;
+                                next_theme state
+                        )
+                )
+
 let keypressed (state: state) ev =
         let key = ev##.key in
         let str = Js.Optdef.case key nullstr id in
-        if state.enabled then
-                with_char_of_js_string str (fun c ->
-                        handle_user_pick state c;
-                        update_pick state.pick c;
-                        update_typos state.counter state.typos;
-                        if_theme_found state (fun () ->
-                                enable_controls state false;
-                                state.complete state (fun () ->
-                                        enable_controls state true;
-                                        next_theme state
-                                )
-                        )
-                );
-                jtrue
+        with_char_of_js_string str (letter_picked state);
+        jtrue
 
 let clicked (state: state) ev =
         Js.Opt.iter ev##.target (fun elem ->
                 let letter_clicked = Js.to_string elem##.className = "ch" in
-                if letter_clicked && state.enabled then (
+                if letter_clicked then
                         let str = Js.Opt.case elem##.textContent nullstr id in
-                        with_char_of_js_string str (fun c ->
-                                handle_user_pick state c;
-                                update_pick state.pick c;
-                                update_typos state.counter state.typos;
-                                if_theme_found state (fun () ->
-                                        enable_controls state false;
-                                        state.complete state (fun () ->
-                                                enable_controls state true;
-                                                next_theme state
-                                        )
-                                )
-                        )
-                )
+                        with_char_of_js_string str (letter_picked state)
         );
         jtrue
 
