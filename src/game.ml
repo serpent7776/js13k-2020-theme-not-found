@@ -3,6 +3,7 @@ module Html = Js_of_ocaml.Dom_html
 
 type state = {
         mutable n: int;
+        mutable enabled: bool;
         mutable typos: int;
         mutable theme: string;
         mutable complete: state -> (unit -> unit) -> unit;
@@ -215,6 +216,7 @@ let create_state board pick note counter =
         let theme = themes.(n) in
         {
                 n = n;
+                enabled = true;
                 typos = 0;
                 theme = theme.text;
                 complete = theme.complete;
@@ -305,20 +307,26 @@ let next_theme state =
         if last state.n then
                 end_game state
 
+let enable_controls state enable =
+        state.enabled <- enable
+
 let keypressed (state: state) ev =
         let key = ev##.key in
         let str = Js.Optdef.case key nullstr id in
-        with_char_of_js_string str (fun c ->
-                handle_user_pick state c;
-                update_pick state.pick c;
-                update_typos state.counter state.typos;
-                if_theme_found state (fun () ->
-                        state.complete state (fun () ->
-                                next_theme state
+        if state.enabled then
+                with_char_of_js_string str (fun c ->
+                        handle_user_pick state c;
+                        update_pick state.pick c;
+                        update_typos state.counter state.typos;
+                        if_theme_found state (fun () ->
+                                enable_controls state false;
+                                state.complete state (fun () ->
+                                        enable_controls state true;
+                                        next_theme state
+                                )
                         )
-                )
-        );
-        jtrue
+                );
+                jtrue
 
 let load _ =
         let board = get_board () in
