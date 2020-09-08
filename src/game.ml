@@ -227,6 +227,10 @@ let create_state board pick note counter =
 let get_text elem =
         Js.Opt.case elem##.textContent nullstr id
 
+let last n =
+        let last_idx = Array.length themes - 1 in
+        last_idx = n
+
 let make_board_html theme =
         let conv = function
                 | ' ' -> "<span class=\"box\"> </span>"
@@ -252,10 +256,11 @@ let reveal_board state letter =
 
 let handle_user_pick state letter =
         reveal_board state letter;
-        let theme_low = state.theme |> String.lowercase_ascii in
-        let letter_low = Char.lowercase_ascii letter in
-        if not (String.contains theme_low letter_low) then
-                state.typos <- state.typos + 1
+        if not (last state.n) then
+                let theme_low = state.theme |> String.lowercase_ascii in
+                let letter_low = Char.lowercase_ascii letter in
+                if not (String.contains theme_low letter_low) then
+                        state.typos <- state.typos + 1
 
 let update_pick pick letter =
         pick##.innerHTML := js_string_of_char letter
@@ -270,10 +275,6 @@ let theme_found state =
 
 let if_theme_found state f =
         if theme_found state then f()
-
-let last n =
-        let last_idx = Array.length themes - 1 in
-        last_idx = n
 
 let end_game state =
         String.iteri (fun idx c ->
