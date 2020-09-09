@@ -13,6 +13,10 @@ h1 {
 	padding: 1em 0;
 }
 
+p {
+	margin: 0.75em 0;
+}
+
 section > * {
 	text-align: center;
 	font-size: 3em;
