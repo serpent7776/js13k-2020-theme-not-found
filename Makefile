@@ -13,7 +13,7 @@ js:
 dist: js
 	@mkdir -p dist
 	cp src/index.html src/style.css build/game.js dist/
-	zip -9r game.zip dist/
+	cd dist && zip -9r ../game.zip ./*
 	advzip -z3 game.zip
 	@als game.zip
 	@printf '%s / %s\n' `stat -f '%z' game.zip` 13312
