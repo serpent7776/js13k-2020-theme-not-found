@@ -164,6 +164,7 @@ section > * {
 }
 .th6 #wi.tr .box {
 	color: transparent;
+	-webkit-background-clip: text;
 	background-clip: text;
 	background-image: linear-gradient(blue, white);
 	border-color: white;
