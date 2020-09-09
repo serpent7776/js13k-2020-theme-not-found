@@ -27,6 +27,11 @@ section > * {
 	background: white;
 }
 
+#pick {
+	display: inline-block;
+	min-width: 1em;
+}
+
 .ch {
 	display: inline-block;
 	width: 1em;
